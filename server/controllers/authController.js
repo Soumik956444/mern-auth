@@ -2,7 +2,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel.js';
-
+import transporter from '../config/nodemailer.js'
 // register user
 export const register = async (req, res)=>{
     const {name, email, password} = req.body;
@@ -39,6 +39,17 @@ export const register = async (req, res)=>{
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', 
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
+
+        // Sending welcome E-Mail to the user
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL,
+            to: email,
+            subject: 'Welcome to ABCD',
+            text: `Welcome to Neotort website. Your account has been createde with email id: ${email}`
+        }
+
+
+        await transporter.sendMail(mailOptions);
 
         return res.json({success: true});
 
