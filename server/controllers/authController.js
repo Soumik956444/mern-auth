@@ -48,8 +48,8 @@ export const register = async (req, res)=>{
         const mailOptions = {
             from: process.env.SENDER_EMAIL,
             to: email,
-            subject: 'Welcome to ABCD',
-            text: `Welcome to Neotort Engineering Hub. Your account has been createde with email id: ${email} and password: ${password}`
+            subject: 'Welcome to Neotort Engineering Hub',
+            text: `Welcome to Neotort Engineering Hub. Your account has been created with email id: ${email} and password: ${password}`
         }
 
 
