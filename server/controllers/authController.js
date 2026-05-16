@@ -49,7 +49,7 @@ export const register = async (req, res)=>{
             from: process.env.SENDER_EMAIL,
             to: email,
             subject: 'Welcome to ABCD',
-            text: `Welcome to Neotort website. Your account has been createde with email id: ${email}`
+            text: `Welcome to Neotort Engineering Hub. Your account has been createde with email id: ${email} and password: ${password}`
         }
 
 
