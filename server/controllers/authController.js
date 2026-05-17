@@ -5,6 +5,7 @@ import userModel from '../models/userModel.js';
 import transporter from '../config/nodemailer.js'
 
 import dotenv from 'dotenv'
+// import { use } from 'react';
 dotenv.config()
 
 // register user
@@ -13,7 +14,7 @@ export const register = async (req, res)=>{
 
     // check if all details are provided
     if(!name || !email || !password){
-        returnres,json({success: false, message: 'Missing Details'})
+        return res.json({success: false, message: 'Missing Details'})
     }
 
     try {
@@ -49,7 +50,7 @@ export const register = async (req, res)=>{
             from: process.env.SENDER_EMAIL,
             to: email,
             subject: 'Welcome to Neotort Engineering Hub',
-            text: `Welcome to Neotort Engineering Hub. Your account has been created with email id: ${email} and password: ${password}`
+            text: `Welcome to Neotort Engineering Hub. Your account has been created with email id: ${email} and password: ${password}. Please keep this information safe.`
         }
 
 
@@ -108,9 +109,6 @@ export const login = async (req, res)=>{
 
 
 
-
-
-
 // logout user
 export const logout = async (req, res) => {
     try {
@@ -135,3 +133,124 @@ export const logout = async (req, res) => {
         });
     }
 };
+
+
+
+
+// sending email verification OTP
+export const sendVerifyotp = async (req, res) => {
+
+    try {
+
+        const { userId } = req.body;
+
+        const user = await userModel.findById(userId);
+
+        if (!user) {
+            return res.json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        if (user.isAccountVerified) {
+            return res.json({
+                success: false,
+                message: 'Account is already verified'
+            });
+        }
+
+        // generate otp
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+
+        // save otp
+        user.verifyotp = otp;
+        user.verifyotpExpireAt = Date.now() + 10 * 60 * 1000;
+
+        await user.save();
+
+        // send email
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL,
+            to: user.email,
+            subject: 'Neotort Engineering Hub - Email Verification OTP',
+            text: `Your verification OTP is: ${otp}`
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        return res.json({
+            success: true,
+            message: 'OTP Sent Successfully'
+        });
+
+    } catch (error) {
+
+        return res.json({
+            success: false,
+            message: error.message
+        });
+
+    }
+
+};
+
+
+
+// // sending email verification OTP
+// export const sendVerifyotp = async (req, res) => {
+//     try{
+//         const user = await userModel.findById(userId);
+
+//         if(!user){
+//             return res.json({success: false, message: 'User not found'});
+//         }
+
+//         if(user.verifyotp === '' || user.verifyotp !== otp){
+//             return res.json({success: false, message: 'Invalid OTP'});
+//         }
+
+//         if(user.verifyotpExpireAt < Date.now()){
+//             return res.json({success: false, message:'OTP Expired'});
+//         }
+
+//         const {userId} = req.body;
+
+//         const user = await userModel.findById(userId);
+
+//         if(user.isAccountVerified){
+//             return res.json({success: false, message: 'Account is already Verified'})
+//         }
+
+//         const otp = String(Math.floor(100000 + Math.random() * 900000));
+
+//         user.sendVerifyotp = otp;
+//         user.verifyotpExporeAt = Date.now() + 10 * 60 * 1000
+
+//         await user.save();
+
+//         const mailOptions = {
+//             from: process.env.SENDER_EMAIL,
+//             to: user.email,
+//             subject: 'Neotort Engineering Hub - Email Verification OTP',
+//             text: `Your verification OTP is: ${otp}. Verify Your Acciunt Using This OTP. This is Valid for 24 Hours.`
+//         }
+//         await transporter.sendMail(mailOptions);
+
+//         return res.json({success: true, message: 'OTP Sent to Your E-Mail'})
+
+//     } catch (error) {
+//         res.json({ success: false, message: error.message });
+//     }
+// }
+
+
+
+
+export const verifyEmail = async (req, res) => {
+    const {userId, otp} = req.body;
+
+    if(!userId || !otp) {
+        return res.json({success: false, message: 'Missing Details'});
+    }
+}
