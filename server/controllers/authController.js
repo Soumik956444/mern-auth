@@ -137,112 +137,53 @@ export const logout = async (req, res) => {
 
 
 
+
+
 // sending email verification OTP
 export const sendVerifyotp = async (req, res) => {
+    try{
 
-    try {
-
-        const { userId } = req.body;
-
-        const user = await userModel.findById(userId);
-
-        if (!user) {
-            return res.json({
-                success: false,
-                message: 'User not found'
-            });
+        if(!user){
+            return res.json({success: false, message: 'User not found'});
         }
 
-        if (user.isAccountVerified) {
-            return res.json({
-                success: false,
-                message: 'Account is already verified'
-            });
+        if(user.verifyotp === '' || user.verifyotp !== otp){
+            return res.json({success: false, message: 'Invalid OTP'});
         }
 
-        // generate otp
+        if(user.verifyotpExpireAt < Date.now()){
+            return res.json({success: false, message:'OTP Expired'});
+        }
+
+        const {userId} = req.body;
+
+        const user = await userModel.findById(userId); 
+
+        if(user.isAccountVerified){
+            return res.json({success: false, message: 'Account is already Verified'})
+        }
+
         const otp = String(Math.floor(100000 + Math.random() * 900000));
 
-        // save otp
-        user.verifyotp = otp;
-        user.verifyotpExpireAt = Date.now() + 10 * 60 * 1000;
+        user.sendVerifyotp = otp;
+        user.verifyotpExporeAt = Date.now() + 10 * 60 * 1000
 
         await user.save();
 
-        // send email
         const mailOptions = {
             from: process.env.SENDER_EMAIL,
             to: user.email,
             subject: 'Neotort Engineering Hub - Email Verification OTP',
-            text: `Your verification OTP is: ${otp}`
-        };
-
+            text: `Your verification OTP is: ${otp}. Verify Your Acciunt Using This OTP. This is Valid for 24 Hours.`
+        }
         await transporter.sendMail(mailOptions);
 
-        return res.json({
-            success: true,
-            message: 'OTP Sent Successfully'
-        });
+        return res.json({success: true, message: 'OTP Sent to Your E-Mail'})
 
     } catch (error) {
-
-        return res.json({
-            success: false,
-            message: error.message
-        });
-
+        res.json({ success: false, message: error.message });
     }
-
-};
-
-
-
-// // sending email verification OTP
-// export const sendVerifyotp = async (req, res) => {
-//     try{
-//         const user = await userModel.findById(userId);
-
-//         if(!user){
-//             return res.json({success: false, message: 'User not found'});
-//         }
-
-//         if(user.verifyotp === '' || user.verifyotp !== otp){
-//             return res.json({success: false, message: 'Invalid OTP'});
-//         }
-
-//         if(user.verifyotpExpireAt < Date.now()){
-//             return res.json({success: false, message:'OTP Expired'});
-//         }
-
-//         const {userId} = req.body;
-
-//         const user = await userModel.findById(userId);
-
-//         if(user.isAccountVerified){
-//             return res.json({success: false, message: 'Account is already Verified'})
-//         }
-
-//         const otp = String(Math.floor(100000 + Math.random() * 900000));
-
-//         user.sendVerifyotp = otp;
-//         user.verifyotpExporeAt = Date.now() + 10 * 60 * 1000
-
-//         await user.save();
-
-//         const mailOptions = {
-//             from: process.env.SENDER_EMAIL,
-//             to: user.email,
-//             subject: 'Neotort Engineering Hub - Email Verification OTP',
-//             text: `Your verification OTP is: ${otp}. Verify Your Acciunt Using This OTP. This is Valid for 24 Hours.`
-//         }
-//         await transporter.sendMail(mailOptions);
-
-//         return res.json({success: true, message: 'OTP Sent to Your E-Mail'})
-
-//     } catch (error) {
-//         res.json({ success: false, message: error.message });
-//     }
-// }
+}
 
 
 
@@ -253,4 +194,5 @@ export const verifyEmail = async (req, res) => {
     if(!userId || !otp) {
         return res.json({success: false, message: 'Missing Details'});
     }
+    
 }
