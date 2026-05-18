@@ -194,5 +194,9 @@ export const verifyEmail = async (req, res) => {
     if(!userId || !otp) {
         return res.json({success: false, message: 'Missing Details'});
     }
-    
+    try {
+        
+    }catch (error) {
+        res.json({success: false, message: error.message});
+    }
 }
