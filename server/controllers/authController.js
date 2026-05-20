@@ -165,8 +165,9 @@ export const sendVerifyotp = async (req, res) => {
 
         const otp = String(Math.floor(100000 + Math.random() * 900000));
 
-        user.sendVerifyotp = otp;
-        user.verifyotpExporeAt = Date.now() + 10 * 60 * 1000
+        // user.sendVerifyotp = otp;
+        user.verifyotp = otp;
+        user.verifyotpExpireAt = Date.now() + 10 * 60 * 1000
 
         await user.save();
 
