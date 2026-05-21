@@ -88,15 +88,30 @@ export const login = async (req, res)=>{
         if(!isMatch){
             return res.json({success: false, message: 'Invalid password'})
         }
-         // generate JWT token
-        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '7d'});
 
-        // set token in cookie
+        if(!user.isAccountVerified){
+            return res.json({success: false, message: 'Account not verified. Please verify your email first.'})
+        }
+
+        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '1d'});
+
+        const newRefreshToken = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '30d'});
+        user.refreshToken = newRefreshToken;
+        user.refreshTokenExpireAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+        await user.save();
+
         res.cookie('token', token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', 
-            maxAge: 7 * 24 * 60 * 60 * 1000
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
         return res.json({success: true});
@@ -112,25 +127,38 @@ export const login = async (req, res)=>{
 // logout user
 export const logout = async (req, res) => {
     try {
+        const storedRefreshToken = req.cookies.refreshToken;
+
+        if (storedRefreshToken) {
+            try {
+                const tokenDecoded = jwt.verify(storedRefreshToken, process.env.JWT_SECRET);
+                const user = await userModel.findById(tokenDecoded.id);
+                if (user) {
+                    user.refreshToken = '';
+                    user.refreshTokenExpireAt = 0;
+                    await user.save();
+                }
+            } catch (_) {
+                // token invalid or expired, still clear cookies
+            }
+        }
+
         res.clearCookie('token', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite:
-                process.env.NODE_ENV === 'production'
-                    ? 'none'
-                    : 'strict',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         });
 
-        return res.json({
-            success: true,
-            message: "Logged Out Successfully",
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         });
+
+        return res.json({ success: true, message: 'Logged Out Successfully' });
 
     } catch (error) {
-        return res.json({
-            success: false,
-            message: error.message,
-        });
+        return res.json({ success: false, message: error.message });
     }
 };
 
@@ -142,22 +170,13 @@ export const logout = async (req, res) => {
 // sending email verification OTP
 export const sendVerifyotp = async (req, res) => {
     try{
+        const {userId} = req.body;
+
+        const user = await userModel.findById(userId);
 
         if(!user){
             return res.json({success: false, message: 'User not found'});
         }
-
-        if(user.verifyotp === '' || user.verifyotp !== otp){
-            return res.json({success: false, message: 'Invalid OTP'});
-        }
-
-        if(user.verifyotpExpireAt < Date.now()){
-            return res.json({success: false, message:'OTP Expired'});
-        }
-
-        const {userId} = req.body;
-
-        const user = await userModel.findById(userId); 
 
         if(user.isAccountVerified){
             return res.json({success: false, message: 'Account is already Verified'})
@@ -165,9 +184,8 @@ export const sendVerifyotp = async (req, res) => {
 
         const otp = String(Math.floor(100000 + Math.random() * 900000));
 
-        // user.sendVerifyotp = otp;
-        user.verifyotp = otp;
-        user.verifyotpExpireAt = Date.now() + 10 * 60 * 1000
+        user.verifyOtp = otp;
+        user.verifyOtpExpireAt = Date.now() + 10 * 60 * 1000
 
         await user.save();
 
@@ -175,7 +193,7 @@ export const sendVerifyotp = async (req, res) => {
             from: process.env.SENDER_EMAIL,
             to: user.email,
             subject: 'Neotort Engineering Hub - Email Verification OTP',
-            text: `Your verification OTP is: ${otp}. Verify Your Acciunt Using This OTP. This is Valid for 24 Hours.`
+            text: `Your verification OTP is: ${otp}. Verify your account using this OTP. Valid for 10 minutes.`
         }
         await transporter.sendMail(mailOptions);
 
@@ -188,7 +206,7 @@ export const sendVerifyotp = async (req, res) => {
 
 
 
-
+// verifying email using OTP
 export const verifyEmail = async (req, res) => {
     const {userId, otp} = req.body;
 
@@ -202,22 +220,137 @@ export const verifyEmail = async (req, res) => {
             return res.json({success: false, message: 'User not found'});
         }
 
-        if(user.verifyotp === '' || user.verifyotp !== otp){
+        if(user.verifyOtp === '' || user.verifyOtp !== otp){
             return res.json({success: false, message: 'Invalid OTP'});
         }
 
-        if(user.verifyotpExpireAt <Date.now()){
+        if(user.verifyOtpExpireAt < Date.now()){
             return res.json({success: false, message: 'OTP is Expired'});
         }
 
         user.isAccountVerified = true;
-        user.verifyotp = '';
-        user.verifyotpExpireAt = 0;
+        user.verifyOtp = '';
+        user.verifyOtpExpireAt = 0;
 
         await user.save();
+
+        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '1d'});
+
+        const newRefreshToken = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '30d'});
+        user.refreshToken = newRefreshToken;
+        user.refreshTokenExpireAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+        await user.save();
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+
         return res.json({success: true, message: 'Account is Verified Successfully'});
-        
+
     }catch (error) {
         res.json({success: false, message: error.message});
+    }
+}
+
+
+// refresh token
+export const refreshToken = async (req, res) => {
+    const storedRefreshToken = req.cookies.refreshToken;
+
+    if (!storedRefreshToken) {
+        return res.json({ success: false, message: 'No refresh token. Login Again' });
+    }
+
+    try {
+        const tokenDecoded = jwt.verify(storedRefreshToken, process.env.JWT_SECRET);
+
+        const user = await userModel.findById(tokenDecoded.id);
+
+        if (!user) {
+            return res.json({ success: false, message: 'User not found. Login Again' });
+        }
+
+        if (user.refreshToken !== storedRefreshToken) {
+            return res.json({ success: false, message: 'Invalid refresh token. Login Again' });
+        }
+
+        if (user.refreshTokenExpireAt < Date.now()) {
+            return res.json({ success: false, message: 'Refresh token expired. Login Again' });
+        }
+
+        const newToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+        const newRefreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+        user.refreshToken = newRefreshToken;
+        user.refreshTokenExpireAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+        await user.save();
+
+        res.cookie('token', newToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+
+        return res.json({ success: true, message: 'Token Refreshed' });
+
+    } catch (error) {
+        return res.json({ success: false, message: 'Invalid or Expired Refresh Token. Login Again' });
+    }
+}
+
+
+// resend verification OTP
+export const resendOtp = async (req, res) => {
+    try {
+        const { userId } = req.body;
+
+        const user = await userModel.findById(userId);
+
+        if (!user) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        if (user.isAccountVerified) {
+            return res.json({ success: false, message: 'Account is already verified' });
+        }
+
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+
+        user.verifyOtp = otp;
+        user.verifyOtpExpireAt = Date.now() + 10 * 60 * 1000;
+
+        await user.save();
+
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL,
+            to: user.email,
+            subject: 'Neotort Engineering Hub - Resend Verification OTP',
+            text: `Your new verification OTP is: ${otp}. Valid for 10 minutes.`
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        return res.json({ success: true, message: 'OTP Resent to Your E-Mail' });
+
+    } catch (error) {
+        res.json({ success: false, message: error.message });
     }
 }
