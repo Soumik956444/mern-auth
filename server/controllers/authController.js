@@ -354,3 +354,9 @@ export const resendOtp = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 }
+
+
+
+export const isAuthenticated = async (req, res) => {
+    
+}
