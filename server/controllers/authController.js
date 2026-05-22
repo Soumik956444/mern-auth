@@ -395,10 +395,11 @@ export const sendResetOtp = async (req, res) => {
         const mailOptions = {
             from: process.env.SENDER_EMAIL,
             to: user.email,
-            subject: 'Neotort Engineering Hub - Email Verification OTP',
-            text: `Your verification OTP is: ${otp}. Verify your account using this OTP. Valid for 10 minutes.`
+            subject: 'Neotort Engineering Hub - Password Reset OTP',
+            text: `Your password reset OTP is: ${otp}. Reset your password using this OTP. Valid for 10 minutes.`
         }
         await transporter.sendMail(mailOptions);
+        return res.json({success: true, message: 'Password Reset OTP Sent to Your E-Mail'});
 
 
 
@@ -406,3 +407,4 @@ export const sendResetOtp = async (req, res) => {
         return res.json({success: false, message: error.message});
     }
 }
+
