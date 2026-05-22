@@ -356,7 +356,53 @@ export const resendOtp = async (req, res) => {
 }
 
 
-
+// Check if user is authenticated 
 export const isAuthenticated = async (req, res) => {
-    
+    try {
+        return res.json({success: true, message: 'User is authenticated'});
+    }catch (error) {
+        res.json({success: false, message: error.message});
+    }
+}
+
+
+
+
+// send password reset OTP
+export const sendResetOtp = async (req, res) => {
+    const {email} = req.body;
+
+    if(!email){
+        return res.json({success: false, message: 'Email is required'});
+    }
+
+    try {
+
+        const user = await userModel.findOne({email});
+
+        if(!user){
+            return res.json({success: false, message: "User not found"});
+        }
+
+
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+
+        user.resetOtp = otp;
+        user.resetOtpExpireAt = Date.now() + 10 * 60 * 1000
+
+        await user.save();
+
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL,
+            to: user.email,
+            subject: 'Neotort Engineering Hub - Email Verification OTP',
+            text: `Your verification OTP is: ${otp}. Verify your account using this OTP. Valid for 10 minutes.`
+        }
+        await transporter.sendMail(mailOptions);
+
+
+
+    }catch (error) {
+        return res.json({success: false, message: error.message});
+    }
 }
