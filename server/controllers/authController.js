@@ -408,3 +408,27 @@ export const sendResetOtp = async (req, res) => {
     }
 }
 
+// Reset Password using OTP. Video will resume on 2 Hour 4 Minutes.
+export const resetPassword = async (req, res) => {
+    const {email, otp, newPassword} = req.body;
+
+    if(!email || !otp || !newPassword) {
+        return res.json({success: false, message: 'Email, OTP and New Password are required'});
+    }
+
+    try {
+
+        const user = await userModel.findOne({email});
+
+        if(!user){
+            return res.json({succcess: false, message: 'User Not Found'});
+        }
+
+        if(user.resetOtp === '' || user.resetOtp !== otp){
+            return res.json({success: false, message: 'Invalid Otp'});
+        }
+
+    }catch (error){
+        return res.json({success: false, message: error.messsage});
+    }
+}
