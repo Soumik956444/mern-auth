@@ -432,6 +432,18 @@ export const resetPassword = async (req, res) => {
             return res.json({success: false, message: 'OTP Expired'});
         }
 
+        // new Password encryption
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // new password saving in database
+        user.password = hashedPassword;
+        user.resetOtp = '';
+        user.resetOtpExpireAt = 0;
+
+        await user.save();
+
+        return res.json({success: true, message: 'Password Reset Successfullt'});
+
     }catch (error){
         return res.json({success: false, message: error.messsage});
     }
