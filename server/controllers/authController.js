@@ -446,3 +446,7 @@ export const resetPassword = async (req, res) => {
 
 //last word API testing is pending
 // video will be resume from 2 hours 12 minutes
+
+const authController = {
+    register, 
+}
