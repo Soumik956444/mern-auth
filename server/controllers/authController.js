@@ -63,6 +63,7 @@ export const register = async (req, res)=>{
         res.json({success: false, message: error.message})
     }
 
+
 }
 
 
@@ -120,8 +121,8 @@ export const login = async (req, res)=>{
         return res.json({ success: false, message: error.message});
     }
 
-}
 
+}
 
 
 // logout user
@@ -163,10 +164,6 @@ export const logout = async (req, res) => {
 };
 
 
-
-
-
-
 // sending email verification OTP
 export const sendVerifyotp = async (req, res) => {
     try{
@@ -203,7 +200,6 @@ export const sendVerifyotp = async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 }
-
 
 
 // verifying email using OTP
@@ -366,8 +362,6 @@ export const isAuthenticated = async (req, res) => {
 }
 
 
-
-
 // send password reset OTP
 export const sendResetOtp = async (req, res) => {
     const {email} = req.body;
@@ -408,7 +402,7 @@ export const sendResetOtp = async (req, res) => {
     }
 }
 
-// Reset Password using OTP. Video will resume on 2 Hour 4 Minutes.
+// Reset Password using OTP.
 export const resetPassword = async (req, res) => {
     const {email, otp, newPassword} = req.body;
 
@@ -448,3 +442,7 @@ export const resetPassword = async (req, res) => {
         return res.json({success: false, message: error.messsage});
     }
 }
+
+
+//last word API testing is pending
+// video will be resume from 2 hours 12 minutes
