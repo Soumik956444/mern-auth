@@ -443,6 +443,4 @@ export const resetPassword = async (req, res) => {
 }
 
 
-// video will be resume from 2 hours 12 minutes
 
-ncducnd
