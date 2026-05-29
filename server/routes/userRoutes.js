@@ -1,9 +1,10 @@
 import express from 'express';
 import userAuth from '../middleware/userAuth.js';
+import { getUserData } from '../controllers/userController.js';
 
 const userRouter = express.Router();
 
-// Define your user-related routes here
-userRouter.get('/data', userAuth, (req, res) => {
+// Route to get user data, protected by user authentication middleware
+userRouter.get('/data', userAuth, getUserData)
 
-});
+export default userRouter;
