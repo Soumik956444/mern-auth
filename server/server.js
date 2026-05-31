@@ -27,7 +27,7 @@ app.use('/api/user', userRouter);
 
 app.listen(port, ()=> console.log(`Server started on PORT:${port}`));
 
-
+const handleUnhandledRejections = (reason, promise) => {
 
 
 
