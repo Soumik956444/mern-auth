@@ -29,11 +29,7 @@ app.listen(port, ()=> console.log(`Server started on PORT:${port}`));
 
 
 
-const handleUnhandledRejection = (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    // Optionally, you can exit the process or perform other cleanup actions here
-    // process.exit(1);
-}
+
 
 
 
