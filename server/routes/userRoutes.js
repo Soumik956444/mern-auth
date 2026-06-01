@@ -12,11 +12,3 @@ export default userRouter;
 
 
 
-
-
-const userRouter = express.Router();
-
-// Route to get user data, protected by user authentication middleware
-userRouter.get('/data', userAuth, getUserData)
-
-export default userRouter;
