@@ -1,6 +1,6 @@
 import React from 'react'
 import { Routes, Route} from 'react-router-dom'
-import Home from './components/Home.jsx'
+import Home from './components/Home'
 import login from './components/Login'
 import EmailVerify from './components/EmailVerify'
 import ResetPPassword from './components/ResetPassword'
@@ -19,4 +19,6 @@ const App = () => {
 }
 
 export default App
-// video will resumr at 2hours 41minutes and 7 seconds.
+
+
+const Login = () => {
