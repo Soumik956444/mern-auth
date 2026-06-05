@@ -21,5 +21,21 @@ const App = () => {
 export default App
 
 
+
+
+
+const App = () => {
+  return (
+    <div>
+      <Routes>
+        <Route path='/' element={<Home/>}/>
+        <Route path='/login' element={<Login/>}/>
+        <Route path='/email-verify' element={<EmailVerify/>}/>
+        <Route path='/reset-password' element={<ResetPassword/>}/>
+      </Routes>
+    </div>
+  )
+}
+
 // facing routing issue     Date: 4th June 2026
 // video will resume at 2 hours and 40 minutes in the video.
