@@ -1,24 +1,30 @@
-import React from 'react'
-import { Routes, Route} from 'react-router-dom'
-import Home from './components/Home'
-import login from './components/Login'
-import EmailVerify from './components/EmailVerify'
-import ResetPPassword from './components/ResetPassword'
+import React from "react"
+import { BrowserRouter, Routes, Route} from "react-router-dom"
+import Home from "./pages/Home"
+import login from "./pages/Login"
+import EmailVerify from "./pages/EmailVerify"
+import ResetPassword from "./pages/ResetPassword"
 
 const App = () => {
   return (
-    <div>
-      <Routes>
-        <Routes path='/' element={<Home/>}/>
-        <Routes path='/login' element={<Login/>}/>
-        <Routes path='/email-verify' element={<EmailVerify/>}/>
-        <Routes path='/reset-password' element={<ResetPassword/>}/>
-      </Routes>
-    </div>
+    <BrowserRouter>
+      <div>
+        <Routes>
+          <Route path="./" element={<Home/>}/>
+          <Route path="./login" element={<Login/>}/>
+          <Route path="./email-verify" element={<EmailVerify/>}/>
+          <Route path="./reset-password" element={<ResetPassword/>}/>
+        </Routes>
+      </div>
+    </BrowserRouter>
   )
 }
 
 export default App
+
+
+
+
 
 
 
