@@ -7,9 +7,15 @@ const Navbar = () => {
 
       <img src={assets.logo} alt="Logo" className='w-28 sm:w-32'/>
 
-      <button className='flex items-center gap-2 border border-gray-500 rounded-full px-6 py-2 text-gray-800 hover:bg-gray-100 transition-all'> login <img src={assets.arrow_icon} alt="" /></button>
+      <button className='flex items-center gap-2 border border-gray-500 rounded-full px-6 py-2 text-gray-800 hover:bg-gray-200 transition-all'> login <img src={assets.arrow_icon} alt="" /></button>
     </div>
   )
 }
 
 export default Navbar
+
+
+
+
+
+// video will resume at 2 hours and 49 minutes in the video.
