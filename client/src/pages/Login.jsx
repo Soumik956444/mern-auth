@@ -30,7 +30,6 @@ const Login = () => {
   )
 }
 
-const styles = {}
 
 
 export default Login
