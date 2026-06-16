@@ -23,11 +23,33 @@ const Login = () => {
 
         <form>
 
-          <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-state-900/50'>
+          {/* name input field */}
+
+          <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-slate-800'>
 
             <img src={assets.person_icon} alt="image"/>
 
             <input className='bg-transparent outline-none text-white placeholder:text-indigo-400' type="text" placeholder="Full Name" required/>
+
+          </div>
+
+          {/* email input field */}
+
+          <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-slate-800'>
+
+            <img src={assets.mail_icon} alt="image"/>
+
+            <input className='bg-transparent outline-none text-white placeholder:text-indigo-400' type="email" placeholder="Email" required/>
+
+          </div>
+
+          {/* password input field */}
+
+          <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-slate-800'>
+
+            <img src={assets.lock_icon} alt="image"/>
+
+            <input className='bg-transparent outline-none text-white placeholder:text-indigo-400' type="password" placeholder="Password" required/>
 
           </div>
 
@@ -51,4 +73,3 @@ export default Login
 
 
 
-// [#333A5C]
