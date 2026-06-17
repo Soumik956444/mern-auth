@@ -1,17 +1,25 @@
 import React from 'react'
 import { assets } from '../assets/assets'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
 
 
+    const navigate = useNavigate()
+
+
     const [state, setState] = useState('Sign up')
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
 
   return (
-     
+    // main container
+
     <div className='flex flex-col items-center justify-center min-h-screen px-6 sm:px-0 bg-gradient-to-br from-blue-300 to-purple-400'>
 
-      <img src={assets.logo} alt="Login"  className='absolute left-5 sm:left-20 top-5 w-28 sm:w-32 cursor-pointer'/>
+      <img onClick={()=>navigate('/')} src={assets.logo} alt="Login"  className='absolute left-5 sm:left-20 top-5 w-28 sm:w-32 cursor-pointer'/>
 
       <div className=' bg-slate-900 p-10 rounded-lg shadow-lg w-full sm:w-96 text-indigo-300 text-sm'>
 
@@ -22,16 +30,16 @@ const Login = () => {
 
 
         <form>
+                    {/* name input field */}
 
-          {/* name input field */}
-
-          <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-slate-800'>
+          {state === 'Sign up' && (<div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-slate-800'>
 
             <img src={assets.person_icon} alt="image"/>
 
-            <input className='bg-transparent outline-none text-white placeholder:text-indigo-400' type="text" placeholder="Full Name" required/>
+            <input onChange={e => setName(e.target.value)} value={name} className='bg-transparent outline-none text-white placeholder:text-indigo-400' type="text" placeholder="Full Name" required/>
 
-          </div>
+          </div>) }
+
 
           {/* email input field */}
 
@@ -39,7 +47,7 @@ const Login = () => {
 
             <img src={assets.mail_icon} alt="image"/>
 
-            <input className='bg-transparent outline-none text-white placeholder:text-indigo-400' type="email" placeholder="Email" required/>
+            <input onChange={e => setEmail(e.target.value)} value={email} className='bg-transparent outline-none text-white placeholder:text-indigo-400' type="email" placeholder="Email" required/>
 
           </div>
 
@@ -49,17 +57,26 @@ const Login = () => {
 
             <img src={assets.lock_icon} alt="image"/>
 
-            <input className='bg-transparent outline-none text-white placeholder:text-indigo-400' type="password" placeholder="Password" required/>
+            <input onChange={e => setPassword(e.target.value)} value={password} className='bg-transparent outline-none text-white placeholder:text-indigo-400' type="password" placeholder="Password" required/>
 
           </div>
 
-          <p className=' mb-4 text-indigo-500 cursor-pointer'>Forgot Password?</p>
+          <p onClick={()=>navigate('/forgot-password')} className=' mb-4 text-indigo-500 cursor-pointer'>Forgot Password?</p>
 
-          <button className='w-full py-2.5 rounded-full'>{state}</button>
+          <button className='w-full py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 text-white font-medium'>{state}</button>
 
         </form>
 
 
+          {/* // toggle between login and signup */}
+
+          {state === 'Sign up' ? (<p className='text-gray-400 text-center text-xs mt-4 '>Already have an account?{' '}
+          <span onClick={()=> setState('Login')} className='text-blue-400 cursor-pointer underline'>Login here</span>
+        </p>)
+        : (<p className='text-gray-400 text-center text-xs mt-4 '>Don't have an account{' '}
+          <span onClick={()=> setState('Sign up')} className='text-blue-400 cursor-pointer underline'>Sign up</span>
+        </p>) }
+        
 
       </div>
 
