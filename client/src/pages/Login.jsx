@@ -93,11 +93,6 @@ export default Login
 
 
 
-const Login = () => {
-  
-}
-
-
 
 
 // 3hr 22min
