@@ -61,7 +61,7 @@ const Login = () => {
 
           </div>
 
-          <p onClick={()=>navigate('/forgot-password')} className=' mb-4 text-indigo-500 cursor-pointer'>Forgot Password?</p>
+          <p onClick={()=>navigate('/reset-password')} className=' mb-4 text-indigo-500 cursor-pointer'>Forgot Password?</p>
 
           <button className='w-full py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 text-white font-medium'>{state}</button>
 
