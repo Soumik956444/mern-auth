@@ -19,7 +19,3 @@ export const AppContextProvider = (props)=>{
     )
 
 } 
-
-const AppContextConsumer = AppContext.Consumer;
-
-export default AppContextConsumer;
