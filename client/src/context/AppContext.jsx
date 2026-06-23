@@ -22,3 +22,12 @@ export const AppContextProvider = (props)=>{
 
 
 
+const useAppContext = () => {
+    const context = react.useContext(AppContext);
+    if (context === undefined) {
+        throw new Error("useAppContext must be used within a AppContextProvider");
+    }
+    return context;
+};
+
+export default useAppContext;
