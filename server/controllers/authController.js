@@ -446,20 +446,3 @@ export const resetPassword = async (req, res) => {
 
 
 
-
-
-
-const authController = {
-    register,
-    login,
-    logout,
-    sendVerifyotp,
-    verifyEmail,
-    refreshToken,
-    resendOtp,
-    isAuthenticated,
-    sendResetOtp,
-    resetPassword
-}
-
-export default authController;
