@@ -21,7 +21,6 @@ export const AppContextProvider = (props)=>{
 } 
 
 
-const AppContext = createContext();
 
 
 
