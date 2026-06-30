@@ -18,4 +18,3 @@ export default Navbar
 
 
 
-// video will resume at 2 hours and 49 minutes in the video.
