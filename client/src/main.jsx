@@ -5,8 +5,12 @@ import App from './App.jsx'
 
 import {BrowserRouter} from 'react-router-dom'
 
+import { AppContextProvider } from './contextAppContext.jsx'
+
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
+  <AppContextProvider>
     <App />
+  </AppContextProvider>
   </BrowserRouter>,
 )

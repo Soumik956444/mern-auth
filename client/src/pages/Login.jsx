@@ -1,7 +1,9 @@
 import React from 'react'
 import { assets } from '../assets/assets'
 import { useState } from 'react'
+import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { AppContext } from '../context/AppContext'
 
 const Login = () => {
 
@@ -9,10 +11,21 @@ const Login = () => {
     const navigate = useNavigate()
 
 
+    const { backendUrl, setIsLoggedIn } = useContext(AppContext)
+
+
     const [state, setState] = useState('Sign up')
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+
+
+    const onSubmitHandler = async (e)=>{
+      try {
+        e.preventDefault()
+
+      }
+    }
 
   return (
     // main container
@@ -29,7 +42,7 @@ const Login = () => {
 
 
 
-        <form>
+        <form onSubmit={onSubmitHandler}>
                     {/* name input field */}
 
           {state === 'Sign up' && (<div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-slate-800'>
