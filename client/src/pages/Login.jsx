@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
+import axios from 'axios'
 
 const Login = () => {
 
@@ -22,8 +23,22 @@ const Login = () => {
 
     const onSubmitHandler = async (e)=>{
       try {
-        e.preventDefault()
+        e.preventDefault();
 
+        axios.defaults.withCredentials = true;
+        
+        if(state === 'Sign up'){
+          const {data} = await axios.post(backendUrl + '/api/auth/register', {name, email, password})
+
+          if(data.success){
+            setIsLoggedIn(true)
+            navigate('/')
+          }else{
+            alert(data.message)
+          }
+        }else{
+
+        }
       }
     }
 
