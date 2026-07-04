@@ -121,4 +121,10 @@ export default Login
 
 
 
-
+const styles = {
+  inputField: 'mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-slate-800',
+  input: 'bg-transparent outline-none text-white placeholder:text-indigo-400',
+  button: 'w-full py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 text-white font-medium',
+  toggleText: 'text-gray-400 text-center text-xs mt-4',
+  toggleLink: 'text-blue-400 cursor-pointer underline'
+}
