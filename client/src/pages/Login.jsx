@@ -1,10 +1,7 @@
 import React from 'react'
 import { assets } from '../assets/assets'
 import { useState } from 'react'
-import { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AppContext } from '../context/AppContext'
-import axios from 'axios'
 
 const Login = () => {
 
@@ -12,35 +9,10 @@ const Login = () => {
     const navigate = useNavigate()
 
 
-    const { backendUrl, setIsLoggedIn } = useContext(AppContext)
-
-
     const [state, setState] = useState('Sign up')
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-
-
-    const onSubmitHandler = async (e)=>{
-      try {
-        e.preventDefault();
-
-        axios.defaults.withCredentials = true;
-        
-        if(state === 'Sign up'){
-          const {data} = await axios.post(backendUrl + '/api/auth/register', {name, email, password})
-
-          if(data.success){
-            setIsLoggedIn(true)
-            navigate('/')
-          }else{
-            alert(data.message)
-          }
-        }else{
-
-        }
-      }
-    }
 
   return (
     // main container
@@ -57,7 +29,7 @@ const Login = () => {
 
 
 
-        <form onSubmit={onSubmitHandler}>
+        <form>
                     {/* name input field */}
 
           {state === 'Sign up' && (<div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-slate-800'>
@@ -117,3 +89,10 @@ const Login = () => {
 
 
 export default Login
+
+
+
+
+
+
+// 3hr 22min
