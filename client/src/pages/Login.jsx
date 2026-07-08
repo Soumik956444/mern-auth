@@ -2,9 +2,16 @@ import { useState } from 'react'
 import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import {AppContext} from '../context/AppContext'
+import axios from 'axios'
+import { useContext } from 'react'
 
 const Login = () => {
   const navigate = useNavigate()
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
+
+  const {backendUrl, setIsLoggedIn} = useContext(AppContext)
 
   const [state, setState] = useState('Sign up')
   const [name, setName] = useState('')
@@ -12,58 +19,30 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
 
-    try {
-      setLoading(true)
+  const onSubmitHandler = async (e) => {
+    try{
+      e.preventDefault();
 
-      if (state === 'Sign up') {
-        if (!name || !email || !password) {
-          toast.error('Missing details')
-          return
+      axios.defaults.withCredentials = true
+
+      if(state === 'Sign up'){
+        const {data} = await axios.post(backendUrl + '/api/auth/register', {name, email, password})
+
+        if(data.success){
+          setIsLoggedIn(true)
+          navigate('/' )
+        }else{
+          alert(data.message)
         }
 
-        const response = await fetch(`${backendUrl}/api/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ name, email, password })
-        })
+      }else{
 
-        const data = await response.json()
-        if (!data?.success) {
-          toast.error(data?.message || 'Signup failed')
-          return
-        }
-
-        toast.success('Account created successfully. Please verify your email.')
-        navigate('/email-verify')
-        return
       }
 
-      // Login
-      const response = await fetch(`${backendUrl}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email, password })
-      })
+    } catch (error) {
 
-      const data = await response.json()
-      if (!data?.success) {
-        toast.error(data?.message || 'Login failed')
-        return
-      }
-
-      toast.success('Login successful')
-      navigate('/')
-    } catch (err) {
-      toast.error(err?.message || 'Something went wrong')
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -86,7 +65,7 @@ const Login = () => {
           {state === 'Sign up' ? 'Create your account' : 'Login to your account!'}
         </p>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={onSubmitHandler}>
           {/* name input field */}
           {state === 'Sign up' && (
             <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-slate-800'>
