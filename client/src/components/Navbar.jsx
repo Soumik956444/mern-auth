@@ -1,13 +1,28 @@
+import { useContext } from 'react'
 import { assets } from '../assets/assets'
+import { AppContext } from '../context/AppContext'
+import { useNavigate } from 'react-router-dom'
 
 
 const Navbar = () => {
+  const navigate = useNavigate()
+  const {isLoggedIn, setIsLoggedIn} = useContext(AppContext)
+
+  const handleLogout = () => {
+    setIsLoggedIn(false)
+    navigate('/login')
+  }
+
   return (
-    <div className='w-full flex justify-between items-center p-4 sm:p-6 sm:px-24 absoulte top-0'>
+    <div className='w-full flex justify-between items-center p-4 sm:p-6 sm:px-24 absolute top-0'>
 
-      <img src={assets.logo} alt="Logo" className='w-28 sm:w-32'/>
+      <img onClick={() => navigate('/')} src={assets.logo} alt="Logo" className='w-28 sm:w-32 cursor-pointer'/>
 
-      <button className='flex items-center gap-2 border border-gray-500 rounded-full px-6 py-2 text-gray-800 hover:bg-gray-100 transition-all'> login <img src={assets.arrow_icon} alt="" /></button>
+      {isLoggedIn ? (
+        <button onClick={handleLogout} className='flex items-center gap-2 border border-gray-500 rounded-full px-6 py-2 text-gray-800 hover:bg-gray-100 transition-all'> Logout <img src={assets.arrow_icon} alt="" /></button>
+      ) : (
+        <button onClick={() => navigate('/login')} className='flex items-center gap-2 border border-gray-500 rounded-full px-6 py-2 text-gray-800 hover:bg-gray-100 transition-all'> Login <img src={assets.arrow_icon} alt="" /></button>
+      )}
     </div>
   )
 }

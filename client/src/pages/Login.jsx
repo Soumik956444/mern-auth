@@ -11,7 +11,7 @@ const Login = () => {
 
   // const backendUrl = import.meta.env.VITE_BACKEND_URL
 
-  const {backendUrl, setIsLoggedIn} = useContext(AppContext)
+  const {backendUrl, setIsLoggedIn, getUserData} = useContext(AppContext)
 
   const [state, setState] = useState('Sign up')
   const [name, setName] = useState('')
@@ -24,6 +24,7 @@ const Login = () => {
   const onSubmitHandler = async (e) => {
     try{
       e.preventDefault();
+      setLoading(true)
 
       axios.defaults.withCredentials = true
 
@@ -32,6 +33,7 @@ const Login = () => {
 
         if(data.success){
           setIsLoggedIn(true)
+          getUserData()
           navigate('/' )
         }else{
           toast.error(data.message)
@@ -42,6 +44,7 @@ const Login = () => {
 
         if(data.success){
           setIsLoggedIn(true)
+          getUserData()
           navigate('/' )
         }else{
           toast.error(data.message)
@@ -49,7 +52,9 @@ const Login = () => {
       }
 
     } catch (error) {
-      toast.error(data.message)
+      toast.error(error.response?.data?.message || 'An error occurred')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -158,6 +163,6 @@ export default Login
 
 
 
-3 hours 42 min
+// 3 hours 47 min
 
 
