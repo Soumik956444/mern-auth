@@ -95,4 +95,3 @@ export default Login
 
 
 
-// 3hr 22min
