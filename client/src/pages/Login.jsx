@@ -9,7 +9,7 @@ import { useContext } from 'react'
 const Login = () => {
   const navigate = useNavigate()
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL
+  // const backendUrl = import.meta.env.VITE_BACKEND_URL
 
   const {backendUrl, setIsLoggedIn} = useContext(AppContext)
 
@@ -34,15 +34,22 @@ const Login = () => {
           setIsLoggedIn(true)
           navigate('/' )
         }else{
-          alert(data.message)
+          toast.error(data.message)
         }
 
       }else{
+        const {data} = await axios.post(backendUrl + '/api/auth/login', {email, password})
 
+        if(data.success){
+          setIsLoggedIn(true)
+          navigate('/' )
+        }else{
+          toast.error(data.message)
+        }
       }
 
     } catch (error) {
-
+      toast.error(data.message)
     }
   }
 
@@ -151,6 +158,6 @@ export default Login
 
 
 
-
+3 hours 42 min
 
 
