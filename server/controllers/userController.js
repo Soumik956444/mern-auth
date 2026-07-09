@@ -12,7 +12,7 @@ export const getUserData = async (req, res) => {
         // send only required data to frontend
         res.json({
             success: true,
-            UserData:{
+            userData: {
                 name: user.name,
                 isAccountVerified: user.isAccountVerified,
             }

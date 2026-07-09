@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { toast } from 'react-toastify';
 import axios from "axios";
 
 export const AppContext = createContext();
@@ -14,7 +15,8 @@ const getUserData = async () => {
 
   try{
 
-    const {data} = await axios.get(backendUrl + '/api/auth/data')
+    axios.defaults.withCredentials = true
+    const {data} = await axios.get(backendUrl + '/api/user/data')
     data.success ? setUserData(data.userData) : toast.error(data.message)
 
   }catch (error) {
