@@ -6,26 +6,24 @@ const userAuth = async (req, res, next) => {
 
     // If no token is found, return an unauthorized response
     if (!token){
-        return res.json({success: false, message: 'Not Authorized. Login Again'})
+        return res.status(401).json({success: false, message: 'Not Authorized. Login Again'})
     }
 
     // Verify the token and extract user information
     try {
-
         const tokenDecoded = jwt.verify(token, process.env.JWT_SECRET)
 
-        if(tokenDecoded.id){
-            req.body = req.body || {};
+        if (tokenDecoded?.id) {
+            req.body = req.body || {}
             req.body.userId = tokenDecoded.id
-        }else{
-            return res.json({success: false, message: 'Not Authorized. Login Again'});
+            next()
+        } else {
+            // Invalid token payload
+            return res.status(401).json({success: false, message: 'Not Authorized. Login Again'})
         }
-
-        next();
-
-
     } catch (error) {
-        res.json({success: false, message: error.message});
+        // Token verification failed
+        return res.status(401).json({success: false, message: 'Not Authorized. Login Again'})
     }
 
 }

@@ -6,6 +6,13 @@ import transporter from '../config/nodemailer.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
+// Shared cookie options for auth cookies (token and refreshToken)
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'none',
+}
+
 // register user
 export const register = async (req, res)=>{
     const {name, email, password} = req.body;
@@ -37,9 +44,7 @@ export const register = async (req, res)=>{
 
         // set token in cookie
         res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', 
+            ...cookieOptions,
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
@@ -63,6 +68,7 @@ export const register = async (req, res)=>{
 
 
 }
+
 
 
 // login user
@@ -99,17 +105,14 @@ export const login = async (req, res)=>{
         user.refreshTokenExpireAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
         await user.save();
 
+        // Set session cookies on successful login
         res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            ...cookieOptions,
             maxAge: 24 * 60 * 60 * 1000
         });
 
         res.cookie('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            ...cookieOptions,
             maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
@@ -145,13 +148,13 @@ export const logout = async (req, res) => {
         res.clearCookie('token', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            sameSite: 'none',
         });
 
         res.clearCookie('refreshToken', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            sameSite: 'none',
         });
 
         return res.json({ success: true, message: 'Logged Out Successfully' });
@@ -235,17 +238,14 @@ export const verifyEmail = async (req, res) => {
         user.refreshTokenExpireAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
         await user.save();
 
+        // Save verification state and set fresh auth cookies after email verification
         res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            ...cookieOptions,
             maxAge: 24 * 60 * 60 * 1000
         });
 
         res.cookie('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            ...cookieOptions,
             maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
@@ -290,16 +290,12 @@ export const refreshToken = async (req, res) => {
         await user.save();
 
         res.cookie('token', newToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            ...cookieOptions,
             maxAge: 24 * 60 * 60 * 1000
         });
-
+ 
         res.cookie('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            ...cookieOptions,
             maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
