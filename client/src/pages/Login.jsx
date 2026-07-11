@@ -26,7 +26,6 @@ const Login = () => {
       e.preventDefault();
       setLoading(true)
 
-      // Ensure cookies are sent with the request for auth token handling
       axios.defaults.withCredentials = true
 
       if(state === 'Sign up'){
@@ -35,7 +34,6 @@ const Login = () => {
         if(data.success){
           setIsLoggedIn(true)
           getUserData()
-          // Redirect new user to the email verification page after successful registration
           navigate('/email-verify')
         }else{
           toast.error(data.message)
@@ -61,7 +59,6 @@ const Login = () => {
   }
 
   return (
-    
     // main container
     <div className='flex flex-col items-center justify-center min-h-screen px-6 sm:px-0 bg-gradient-to-br from-blue-300 to-purple-400'>
       <img
@@ -167,4 +164,5 @@ export default Login
 
 
 // 3 hours 47 min
+
 

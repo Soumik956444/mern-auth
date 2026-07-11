@@ -6,13 +6,6 @@ import transporter from '../config/nodemailer.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
-// Shared cookie options for auth cookies (token and refreshToken)
-const cookieOptions = {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
-}
-
 // register user
 export const register = async (req, res)=>{
     const {name, email, password} = req.body;
@@ -36,24 +29,41 @@ export const register = async (req, res)=>{
         // create new user
         const user = new userModel({name, email, password: hashedPassword});
 
+        // generate a verification OTP so the user can verify their email
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+        user.verifyOtp = otp;
+        user.verifyOtpExpireAt = Date.now() + 10 * 60 * 1000;
+
+        // generate tokens (kept consistent with the login flow)
+        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '1d'});
+        const newRefreshToken = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '30d'});
+        user.refreshToken = newRefreshToken;
+        user.refreshTokenExpireAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
+
         // sotring users in mongoDB database
-        await user.save(); 
+        await user.save();
 
-        // generate JWT token
-        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '7d'});
-
-        // set token in cookie
+        // set token cookies
         res.cookie('token', token, {
-            ...cookieOptions,
-            maxAge: 7 * 24 * 60 * 60 * 1000
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 24 * 60 * 60 * 1000
         });
 
-        // Sending welcome E-Mail to the user
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000
+        });
+
+        // Sending welcome + verification E-Mail to the user (never email passwords)
         const mailOptions = {
             from: process.env.SENDER_EMAIL,
             to: email,
             subject: 'Welcome to Neotort Engineering Hub',
-            text: `Welcome to Neotort Engineering Hub. Your account has been created with email id: ${email} and password: ${password}. Please keep this information safe.`
+            text: `Welcome to Neotort Engineering Hub, ${name}! Your account has been created with email id: ${email}. Your email verification OTP is: ${otp} (valid for 10 minutes).`
         }
 
 
@@ -68,7 +78,6 @@ export const register = async (req, res)=>{
 
 
 }
-
 
 
 // login user
@@ -105,14 +114,17 @@ export const login = async (req, res)=>{
         user.refreshTokenExpireAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
         await user.save();
 
-        // Set session cookies on successful login
         res.cookie('token', token, {
-            ...cookieOptions,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
             maxAge: 24 * 60 * 60 * 1000
         });
 
         res.cookie('refreshToken', newRefreshToken, {
-            ...cookieOptions,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
             maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
@@ -148,13 +160,13 @@ export const logout = async (req, res) => {
         res.clearCookie('token', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         });
 
         res.clearCookie('refreshToken', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'none',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         });
 
         return res.json({ success: true, message: 'Logged Out Successfully' });
@@ -238,14 +250,17 @@ export const verifyEmail = async (req, res) => {
         user.refreshTokenExpireAt = Date.now() + 30 * 24 * 60 * 60 * 1000;
         await user.save();
 
-        // Save verification state and set fresh auth cookies after email verification
         res.cookie('token', token, {
-            ...cookieOptions,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
             maxAge: 24 * 60 * 60 * 1000
         });
 
         res.cookie('refreshToken', newRefreshToken, {
-            ...cookieOptions,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
             maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
@@ -290,12 +305,16 @@ export const refreshToken = async (req, res) => {
         await user.save();
 
         res.cookie('token', newToken, {
-            ...cookieOptions,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
             maxAge: 24 * 60 * 60 * 1000
         });
- 
+
         res.cookie('refreshToken', newRefreshToken, {
-            ...cookieOptions,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
             maxAge: 30 * 24 * 60 * 60 * 1000
         });
 
@@ -409,7 +428,7 @@ export const resetPassword = async (req, res) => {
         const user = await userModel.findOne({email});
 
         if(!user){
-            return res.json({succcess: false, message: 'User Not Found'});
+            return res.json({success: false, message: 'User Not Found'});
         }
 
         if(user.resetOtp === '' || user.resetOtp !== otp){
@@ -430,10 +449,10 @@ export const resetPassword = async (req, res) => {
 
         await user.save();
 
-        return res.json({success: true, message: 'Password Reset Successfullt'});
+        return res.json({success: true, message: 'Password Reset Successfully'});
 
     }catch (error){
-        return res.json({success: false, message: error.messsage});
+        return res.json({success: false, message: error.message});
     }
 }
 

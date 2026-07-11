@@ -1,5 +1,4 @@
 import { useContext } from 'react'
-import axios from 'axios'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 import { useNavigate } from 'react-router-dom'
@@ -7,21 +6,11 @@ import { useNavigate } from 'react-router-dom'
 
 const Navbar = () => {
   const navigate = useNavigate()
-  const { backendUrl, isLoggedIn, setIsLoggedIn, setUserData } = useContext(AppContext)
+  const {isLoggedIn, logout} = useContext(AppContext)
 
   const handleLogout = async () => {
-    try {
-      await axios.post(backendUrl + '/api/auth/logout', {}, {
-        withCredentials: true
-      })
-    } catch (error) {
-      // We still clear the client-side auth state even if logout request fails
-      console.error('Logout failed:', error)
-    } finally {
-      setIsLoggedIn(false)
-      setUserData(null)
-      navigate('/login')
-    }
+    await logout()
+    navigate('/login')
   }
 
   return (

@@ -7,7 +7,7 @@ export const getUserData = async (req, res) => {
         const user = await userModel.findById(userId);
 
         if(!user){
-            res.json({success: false, message: 'User Not Found', data: user})
+            return res.json({success: false, message: 'User Not Found'})
         }
         // send only required data to frontend
         res.json({
