@@ -1,3 +1,7 @@
+// client/src/components/Navbar.jsx — top navigation bar
+// - shows login/logout button based on AppContext.isLoggedIn
+// - provides quick navigation to login or home
+
 import { useContext } from 'react'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'

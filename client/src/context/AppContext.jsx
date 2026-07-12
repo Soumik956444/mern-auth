@@ -1,3 +1,7 @@
+// client/src/context/AppContext.jsx — global React context for auth state
+// - exposes backendUrl, auth state, user data and helper functions (getUserData, logout)
+// - performs initial auth check on mount to keep user logged in via cookies
+
 import { createContext, useEffect, useState } from "react";
 import { toast } from 'react-toastify';
 import axios from "axios";

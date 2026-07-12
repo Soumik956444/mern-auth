@@ -1,3 +1,7 @@
+// server.js — Express server entrypoint for the MERN auth app
+// - Initializes the Express application, connects to MongoDB
+// - Configures middleware (JSON parsing, cookies, CORS)
+// - Mounts API routers for auth and user endpoints
 
 import express from "express";
 import cors from "cors";

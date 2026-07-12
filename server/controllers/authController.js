@@ -1,4 +1,8 @@
-// import necessary modules
+// controllers/authController.js — handles authentication related operations
+// - register, login, logout
+// - email verification (send/verify OTP), password reset (send/reset OTP)
+// - refresh tokens and resend OTP
+
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel.js';

@@ -1,4 +1,8 @@
 
+// client/src/components/Header.jsx — landing header shown on home page
+// - Greets the user by name when userData is available
+// - Displays hero image and a call-to-action button
+
 import { useContext } from 'react'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'

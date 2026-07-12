@@ -1,3 +1,5 @@
+// middleware/userAuth.js — Express middleware that validates JWT from cookies
+// If token is valid, attaches userId to req.body and calls next(), otherwise returns an error
 import jwt from "jsonwebtoken";
 
 // Middleware function to authenticate user based on JWT token in cookies

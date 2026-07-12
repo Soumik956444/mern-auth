@@ -1,3 +1,7 @@
+// client/src/pages/ResetPassword.jsx — multi-step password reset UI
+// Steps: send OTP to email -> enter OTP -> set new password
+// Uses AppContext.backendUrl for API requests
+
 import { useContext, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'

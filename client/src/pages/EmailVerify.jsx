@@ -1,3 +1,7 @@
+// client/src/pages/EmailVerify.jsx — UI for verifying user's email via 6-digit OTP
+// - Handles input, paste, resend and verify flows
+// - Redirects to home if account already verified
+
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'

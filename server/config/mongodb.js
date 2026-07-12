@@ -1,3 +1,5 @@
+// config/mongodb.js — helper to connect to MongoDB using Mongoose
+// Exports a connectDB function which connects to the configured MongoDB URI
 import mongoose from "mongoose";
 
 const connectDB = async ()=>{

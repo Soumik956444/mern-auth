@@ -1,3 +1,5 @@
+// models/userModel.js — Mongoose schema/model for application users
+// Stores hashed password, OTPs + expirations, account verification flag, and refresh tokens
 import mongoose from "mongoose";
 
 // Define the user schema for MongoDB using Mongoose

@@ -1,3 +1,7 @@
+// client/src/pages/Login.jsx — Login / Signup form
+// - Supports signup (creates account and sends verification OTP) and login flows
+// - Uses AppContext to update auth state and fetch user data
+
 import { useState } from 'react'
 import { assets } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
